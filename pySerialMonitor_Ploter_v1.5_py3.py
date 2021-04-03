@@ -617,12 +617,12 @@ class CurveDemo(QMainWindow):
       
         #self.statusBar().setStyleSheet("QStatusBar::item{border: 5px}")
         self.statusBar().setStyleSheet("color:green")
-        self.statusBar().addPermanentWidget(VLine())
+        #self.statusBar().addPermanentWidget(VLine())
         self.statusBar().addPermanentWidget(QLabel("X = "))
-        self.statusBar().addPermanentWidget(VLine())
+        #self.statusBar().addPermanentWidget(VLine())
         self.statusBar().addPermanentWidget(QLabel("Y = "))
         
-        self.statusBar().addPermanentWidget(VLine())
+        #self.statusBar().addPermanentWidget(VLine())
         
         PermanentLabel = QLabel("Version:" + kProgVersion  + " Developed by " + kProgramDeveloperName + " Python. Running with " + kPythonVersion )
         font3 = QFont()
