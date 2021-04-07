@@ -128,7 +128,8 @@ class DataPlot(QwtPlot):
         
         self.uut_dev = None
         self.timerId = None
-        self.interval = 250    # ms
+        #self.interval = 250    # ms
+        self.interval = config.interval    # ms
         
         fileTIME = datetime.datetime.now()
         File_timestamp = "%04d-%02d-%02d_%02d%02d%02d" % (fileTIME.year,fileTIME.month,fileTIME.day,fileTIME.hour, fileTIME.minute, fileTIME.second)
@@ -269,7 +270,7 @@ class DataPlot(QwtPlot):
         else:
             if not self.timerId:
                 print(self.interval)
-                self.timerId = self.startTimer(250)
+                self.timerId = self.startTimer(self.interval)
                 self.signal_showinfo.emit("Timer Started!")
     
     def StopTimer(self):
@@ -286,9 +287,13 @@ class DataPlot(QwtPlot):
             try:
                 self.uut_dev = device_py3.SerialDevice(False, False, port = COMPort , baudrate = baudrate) #'''args[0]'''            
                 self.signal_showinfo.emit('Device opened success!')
-                print(self.sendcmd(self.uut_dev,"echo 0\r\n"))
-                time.sleep(0.5)
-                print(self.sendcmd(self.uut_dev,"prompt off\r\n"))
+                
+                # Do Configuration settings:
+                for cmd in config.pre_cmd:
+                    print(self.sendcmd(self.uut_dev,cmd + "\r\n"))                
+                    time.sleep(0.5)
+                #print(self.sendcmd(self.uut_dev,"echo 0\r\n"))
+                #print(self.sendcmd(self.uut_dev,"prompt off\r\n"))
                 
             except Exception as e:
                 print(e,'\r\nDevice opened failed!')
@@ -343,7 +348,7 @@ class DataPlot(QwtPlot):
         #ifdata = self.uut_get_val(self.uut_dev, "READ:CURR:DC?\r")   # GW CURRENT
         #tfdata = self.uut_get_val(self.uut_dev, "x?\r\n")   # 8508
         
-        tfdata = self.uut_get_val(self.uut_dev, "UPPER_VAL?\r\n")   # pass/pac
+        tfdata = self.uut_get_val(self.uut_dev, config.GetReadingCmd + "\r\n")  #"UPPER_VAL?\r\n")   # pass/pac
     
         self.showPeak(int(self.x_range),tfdata)	
         #print(tfdata)  #, "\t"	, ifdata
@@ -387,7 +392,7 @@ class DataPlot(QwtPlot):
     def uut_get_val(self,uut_dev_in, type = "x?\r\n"):      #[0-9]\d*\.\d+$    #r'[ -+]\d+\.\d+[Ee][-+][0-9]{2}'   #r'[-]?\d+\.\d+' 匹配正负小数
         cmd_encode = type.encode()
         
-        m, self.unit = uut_dev_in.trx(cmd_encode,  r'^[-]?([0-9]{1,}[.]?[0-9]*)')   # ^[-]?([0-9]{1,}[.]?[0-9]*)$   - 匹配正负小数和整数
+        m, self.unit = uut_dev_in.trx(cmd_encode,  config.rsp_regular)   #r'^[-]?([0-9]{1,}[.]?[0-9]*)')   # ^[-]?([0-9]{1,}[.]?[0-9]*)$   - 匹配正负小数和整数
         
         if m:
             return float(m.group(0))
@@ -688,7 +693,7 @@ class CurveDemo(QMainWindow):
  
     def exportDocument(self):
         renderer = QwtPlotRenderer(self.plot)
-        renderer.exportTo(self.plot, "./export/export_%d"%(datetime.datetime.now()))
+        renderer.exportTo(self.plot, "./export/export_%s"%(str(datetime.datetime.now())))
      
     def showInfo(self, text=""):
         self.statusBar().showMessage(text)
@@ -708,7 +713,8 @@ class CurveDemo(QMainWindow):
    
 def make(argv):  
     demo = CurveDemo()      
-    demo.show()
+    #demo.show()
+    demo.showMaximized()
     return demo
 
 

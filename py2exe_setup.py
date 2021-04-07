@@ -8,17 +8,17 @@ print u"Pack Begining 开始打包"
 
 setup(
     version = "1.0",
-    description = u"UpMachine",
-    name = "UpMachine",
-    url = None,
-    author = u'harry159821',
-    author_email = u'harry159821@gmail.com',
-    license = "UpMachine License",
+    description = u"PySerialMoniterPlotter",
+    name = "PySerialMoniterPlotter",
+    url = "https://github.com/cyber211",
+    author = u'cyber211',
+    author_email = u'cyber.shu@gmail.com',
+    license = "GNU",
     zipfile= None, # 'library.zip', 
     windows=[{
                 "script":"UpMachine.py", # 列举出转换成GUI窗口程序的脚本
                 'icon_resources': [(1, './icon.ico')],  # 程序图标
-                'copyright': "Copyright (c) 2015 harry159821." # copyright
+                'copyright': "Copyright (c) 2021 Bob Cao." # copyright
             }],
     options={
         "py2exe":{

@@ -16,3 +16,15 @@ Y_grid_interval = 50
 
 # Slope Rate caculate points number, 40 points  = 10s(40 *250ms)
 Slope_lenth = 40
+
+# pre-Configure Command
+pre_cmd = [
+            'echo off',
+            'prompt off'
+            ]
+            
+GetReadingCmd = "UPPER_VAL?"
+rsp_regular = r'^[-]?([0-9]{1,}[.]?[0-9]*)'
+
+# Get readings sample rate
+interval  = 250  # ms
