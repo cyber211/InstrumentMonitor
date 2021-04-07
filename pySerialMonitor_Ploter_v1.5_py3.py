@@ -156,15 +156,14 @@ class DataPlot(QwtPlot):
         grid = QwtPlotGrid()
         grid.attach(self)
         grid.setMajorPen(QPen(Qt.black, 0, Qt.DotLine))
+        
         # x Axis property 
         #self.setAxisScaleDraw(QwtPlot.xBottom, TimeScaleDraw(self.cpuStat.upTime()))        
         #timeScale = QwtDateScaleDraw(Qt.LocalTime)
         #print(timeScale)
-        #self.setAxisScaleDraw(QwtPlot.xBottom, timeScale) 
+        #self.setAxisScaleDraw(QwtPlot.xBottom, timeScale)
         
-        self.setAxisScale(QwtPlot.xBottom, 0.0,self.x_range,self.x_interval)      
-        
-        
+        self.setAxisScale(QwtPlot.xBottom, 0.0,self.x_range,self.x_interval)  
         
         #self.setAxisAutoScale(QwtPlot.yLeft,True)
         #self.setAxisScale(QwtPlot.yLeft,99.99,100.0,0.0005)
@@ -235,8 +234,7 @@ class DataPlot(QwtPlot):
         self.setAxisTitle(QwtPlot.xBottom, "Time (seconds)")
         self.setAxisTitle(QwtPlot.yLeft, "UUT - Reading(%s)"%(self.unit))
         
-        self.replot()
-        
+        self.replot()        
  
         #self.startTimer(250)#ms# FOR GET READING        
         #self.starttime = time.clock();#unit: s    python2
@@ -280,8 +278,6 @@ class DataPlot(QwtPlot):
                 self.timerId = None
                 self.signal_showinfo.emit("Timmer stoped!")
             
-            
-    
     def Connect(self,COMPort,baudrate):
         if self.uut_dev is None:
             try:
@@ -299,15 +295,12 @@ class DataPlot(QwtPlot):
                 print(e,'\r\nDevice opened failed!')
                 self.signal_showinfo.emit('Device opened failed!\r\n**********************************************')
                 QMessageBox.warning(self, 'Warning','Device opened failed! Please Check the COM port!!',QMessageBox.Yes,QMessageBox.Yes)
-                
-            
 
         else:
             print("Device already opened!")            
             self.signal_showinfo.emit("Device already opened!")
             QMessageBox.warning(self, 'Warning','Device has already opened!',QMessageBox.Yes,QMessageBox.Yes)
-            
-        
+    
     def DisConnect(self):
         self.StopTimer()
         if self.uut_dev:
@@ -316,8 +309,7 @@ class DataPlot(QwtPlot):
             print("Device disconnected! \r\n")
             self.signal_showinfo.emit("Device disconnected!")
             QMessageBox.warning(self, 'Warning','Device disconnected!',QMessageBox.Yes,QMessageBox.Yes)
-        
-    
+ 
     def showPeak(self, x,amplitude):
         self.peakMarker.setValue(x,amplitude)   # position
         label = self.peakMarker.label()
@@ -375,12 +367,12 @@ class DataPlot(QwtPlot):
         self.SaveData(tfdata)
         
         
-        #now = time.clock(); 
-        now = time.time();         
+        #now = time.clock();   # python 2
+        now = time.time();     # python 3    
         if((now - self.starttime) > int(self.x_range)):  #  points (seconds)
             
-            #self.starttime = time.clock(); # reset start time
-            self.starttime = time.time(); # reset start time
+            #self.starttime = time.clock(); # reset start time  python 2
+            self.starttime = time.time(); # reset start time    python 3
            
             pngTIME = datetime.datetime.now()
             FILE_timestamp = "%04d-%02d-%02d_%02d%02d%02d" % (pngTIME.year,pngTIME.month,pngTIME.day,pngTIME.hour, pngTIME.minute, pngTIME.second)
@@ -520,7 +512,7 @@ class CurveDemo(QMainWindow):
 
         toolBar.addWidget(lbl_x_lower)
         
-        self.LineEdit_x_lower= QLineEdit(str(0),toolBar)
+        self.LineEdit_x_lower= QLineEdit(str(config.X_lower),toolBar)
         self.LineEdit_x_lower.setFont(font2)
 
         toolBar.addWidget(self.LineEdit_x_lower)
@@ -709,7 +701,23 @@ class CurveDemo(QMainWindow):
  
     def selected(self, _):
         self.showInfo()
- 
+    
+    # Get QMainWindow Close event , executed just before  the window closes. 
+    def closeEvent(self, *args, **kwargs):        
+        if QMessageBox.Yes == QMessageBox.warning(self, 'Warning','The default Parameters are stored in conf.ini files!',QMessageBox.Yes|QMessageBox.No,QMessageBox.Yes):
+           config.write_item_value('COM','Port',self.lineEdit_COM.text())
+           config.write_item_value('COM','BaudRate',self.lineEdit_baud.text())
+           
+           config.write_item_value('X_axis','X_lower',str(self.plot.x_ZERO))
+           config.write_item_value('X_axis','X_upper',str(self.plot.x_range))
+           config.write_item_value('X_axis','X_grid_interval',str(self.plot.x_interval))
+           
+           config.write_item_value('Y_axis','Y_lower',str(self.plot.y_range_Lower))
+           config.write_item_value('Y_axis','Y_upper',str(self.plot.y_range_Upper))
+           config.write_item_value('Y_axis','Y_grid_interval',str(self.plot.y_interval))
+          
+
+
    
 def make(argv):  
     demo = CurveDemo()      
